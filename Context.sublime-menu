@@ -1,6 +1,16 @@
 [
 	{
-		"caption": "Remindersnew", "children": [
+		"caption": "Remindersnew", "children": 
+		[
+			{
+				"caption": "Snooze Til..", "children": 
+				[
+					{"caption": "Tomorrow", "args": {"op": "snooze", "years": 0, "months": 0, "days": 1}, "command": "reminder_finder"},
+					{"caption": "Next Week", "args": {"op": "snooze", "years": 0, "months": 0, "days": 7}, "command": "reminder_finder"},
+					{"caption": "Next Month", "args": {"op": "snooze", "years": 0, "months": 1, "days": 0}, "command": "reminder_finder"},
+					{"caption": "Next Year", "args": {"op": "snooze", "years": 1, "months": 0, "days": 0}, "command": "reminder_finder"}
+				]
+			}, 
 			{
 				"caption": "Update", "args": {"op": "updateReminders"}, "command": "reminder_finder"
 			}, 

@@ -1,8 +1,8 @@
 import sublime, sublime_plugin, sys
-import json
-import random, os
-from time import gmtime, strftime
-from datetime import date, timedelta
+#import json
+#import random, os
+#from time import gmtime, strftime
+from datetime import date, timedelta, datetime
 import re
 
 class ReminderFinderCommand(sublime_plugin.TextCommand):
@@ -25,6 +25,9 @@ class ReminderFinderCommand(sublime_plugin.TextCommand):
 		elif args['op'] == 'goToReminders':
 			self.goToReminders(edit)
 
+		elif args['op'] == 'snooze':
+			self.snooze(edit, args)
+
 
 	def updateReminders(self, edit):
 
@@ -32,6 +35,10 @@ class ReminderFinderCommand(sublime_plugin.TextCommand):
 
 		config = sublime.load_settings("Reminder_Finder.sublime-settings")
 		
+		if type(remindFilePath) is None:
+			print "Cannot find correct settings file"
+			return
+
 		remindFilePath = config.get("remindFile").encode('ascii','ignore').encode('string-escape')
 		insertionFilePath = config.get("todoInsertionFile").encode('ascii','ignore').encode('string-escape')
 		startDelim = config.get("startDelimiter").encode('ascii','ignore')
@@ -130,7 +137,6 @@ class ReminderFinderCommand(sublime_plugin.TextCommand):
 			#Insert results into that space
 			self.view.insert(edit, start, '\n' +  results)
 
-
 	def addToReminders(self, edit):
 		print "Adding to reminders"
 
@@ -163,15 +169,12 @@ class ReminderFinderCommand(sublime_plugin.TextCommand):
 				f.write("\n" + line)
 				f.close()
 
-				#stub: save reminders file?
-
 				#if successful, remove from current file
 				self.view.erase(edit, sublime.Region(start,end))
 
 				print "Sent {" + line + "} to reminders file"
 		else:
 			print "Could not find a valid date beginning in the form ####-##-##"
-
 
 	def removeFromReminders(self,edit):
 		##STUB, archive instead of remove?
@@ -187,7 +190,7 @@ class ReminderFinderCommand(sublime_plugin.TextCommand):
 
 		if type(remindFilePath) is None:
 			print "Missing Some Settings--Check remindFilePath or insertionFilePath settings"
-			return 
+			return -1
 
 		#open reminders file with write permissions
 		try:
@@ -197,6 +200,7 @@ class ReminderFinderCommand(sublime_plugin.TextCommand):
 		except ValueError, IOError:
 			valid = False
 			print "Cannot open reminder file"
+			return -1
 
 		print "Loaded Reminder File"
 
@@ -209,6 +213,7 @@ class ReminderFinderCommand(sublime_plugin.TextCommand):
 		index = reminders.find(line)
 		if index == -1:
 			print "Could not find that reminder"
+			return -1
 		else:
 			remindEnd = index
 			while(remindEnd < len(reminders) and reminders[remindEnd] != '\n'):
@@ -229,7 +234,6 @@ class ReminderFinderCommand(sublime_plugin.TextCommand):
 			self.view.erase(edit, sublime.Region(start,end))
 
 		pass
-
 
 	def goToReminders(self,edit):
 		#get info on remind file
@@ -278,6 +282,31 @@ class ReminderFinderCommand(sublime_plugin.TextCommand):
 		f.close()
 
 		pass
+
+	def snooze(self, edit, args):
+
+		#Get line
+		line, start, end = self.grabLine()
+
+		#check if valid format
+		if not re.match(r"^[0-9]{4}-[0-1][0-9]-[0-3][0-9]", line):
+			print "Could not find a valid date beginning in the form ####-##-##"
+
+		else:
+
+			#pull off date, use strptime and strftime to add time to it, put it back  This could be one line, but that's not nice.
+			#https://docs.python.org/2/library/datetime.html
+			#stub, adding a month adds 4 weeks of days, so a month past 8/15 won't necessarily be 9/15, it might be 9/12 or 9/16 depending on the month lengths.  Feature or bug?..  Consider case 2016-08-15 - Every 15th I do something, then snooze it for a month
+			lineDate = line[0:10]
+			lineDateStruct = datetime.strptime(lineDate, "%Y-%m-%d")
+			newDate = lineDateStruct + timedelta(weeks=args["years"]*52 + args["months"]*4, days=args["days"])
+			newDateString = newDate.strftime("%Y-%m-%d")
+			newLine = newDateString + line[10:]
+
+			#remove from reminders
+			#add to reminders
+			#remove from current text
+
 
 	def grabLine(self):
 		s = self.view.sel()[0]
