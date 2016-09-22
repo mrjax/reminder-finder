@@ -1,0 +1,10 @@
+[
+	{
+		"keys": ["ctrl+alt+a"], "command": "reminder_finder",
+		"args": { "op": "addToReminders"}
+	},
+	{
+		"keys": ["ctrl+alt+r"], "command": "reminder_finder",
+		"args": { "op": "removeFromReminders"}
+	}
+]

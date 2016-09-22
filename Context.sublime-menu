@@ -1,0 +1,21 @@
+[
+	{
+		"caption": "Remindersnew", "children": [
+			{
+				"caption": "Update", "args": {"op": "updateReminders"}, "command": "reminder_finder"
+			}, 
+			{
+				"caption": "Add", "args": {"op": "addToReminders"}, "command": "reminder_finder"
+			},
+			{
+				"caption": "Remove", "args": {"op": "removeFromReminders"}, "command": "reminder_finder"
+			}, 
+			{
+				"caption": "Open Reminders", "args": {"op": "goToReminders"}, "command": "reminder_finder"
+			}, 
+			{
+				"caption": "Sort Reminders", "args": {"op": "sortReminders"}, "command": "reminder_finder"
+			}
+		]
+	}
+]
